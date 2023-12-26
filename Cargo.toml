@@ -1,0 +1,28 @@
+[package]
+name = "tarutil"
+version = "0.1.0"
+edition = "2021"
+
+license-file = "LICENSE.md"
+readme = "README.md"
+homepage = "https://github.com/UpcraftLP/tarutil-rs"
+repository = "https://github.com/UpcraftLP/tarutil-rs"
+
+authors = ["Up <up@upcraf.dev>"]
+description = "CLI utility to extract tarballs with conflicting file paths on case-insensitive operating systems"
+categories = ["command-line-utilities", "compression", "encoding"]
+keywords = ["tar", "tarball", "archive", "case-insensitive", "extract"]
+
+[[bin]]
+name = "tarutil"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.76"
+bimap = "0.6.3"
+clap = { version = "4.4.11", features = ["derive"] }
+flate2 = "1.0.28"
+indicatif = "0.17.7"
+tar = "0.4.40"
