@@ -10,11 +10,8 @@ use clap::Parser;
 )]
 pub(crate) struct Args {
 
-    #[arg(short = 'o', long)]
-    pub output: Option<PathBuf>,
-
-    #[arg(long)]
-    pub mapping_file: Option<PathBuf>,
+    #[clap(flatten)]
+    pub tasks: Tasks,
 
     #[arg(long)]
     pub errors_file: Option<PathBuf>,
@@ -30,4 +27,16 @@ pub(crate) struct Args {
 
     #[arg()]
     pub input: PathBuf,
+}
+
+#[derive(Debug, clap::Args)]
+#[group(required = true, multiple = true)]
+pub struct Tasks {
+
+    #[arg(short = 'o', long)]
+    pub output: Option<PathBuf>,
+
+    #[arg(long)]
+    pub mapping_file: Option<PathBuf>,
+
 }

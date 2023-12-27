@@ -26,7 +26,7 @@ fn main() -> anyhow::Result<()> {
 
     let mut paths: BiMap<String, String> = BiHashMap::new();
 
-    let mut mapping_file = args.mapping_file.map(|p| BufWriter::new(File::create(p).expect("Failed to create mapping file")));
+    let mut mapping_file = args.tasks.mapping_file.map(|p| BufWriter::new(File::create(p).expect("Failed to create mapping file")));
     let mut errors: Vec<String> = Vec::new();
 
     println!("Processing archive...");
@@ -101,7 +101,7 @@ fn main() -> anyhow::Result<()> {
                 writeln!(buffer, "{original} {lowercase}")?;
             }
 
-            if let Some(path) = &args.output {
+            if let Some(path) = &args.tasks.output {
                 let out_path = path.join(lowercase);
                 if let Some(parent) = out_path.parent() {
                     fs::create_dir_all(parent)?;
