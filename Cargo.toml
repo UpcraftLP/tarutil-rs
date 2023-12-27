@@ -1,6 +1,6 @@
 [package]
 name = "tarutil"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 
 license-file = "LICENSE.md"
@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/UpcraftLP/tarutil-rs"
 repository = "https://github.com/UpcraftLP/tarutil-rs"
 
-authors = ["Up <up@upcraf.dev>"]
+authors = ["Up <up@upcraft.dev>"]
 description = "CLI utility to extract tarballs with conflicting file paths on case-insensitive operating systems"
 categories = ["command-line-utilities", "compression", "encoding"]
 keywords = ["tar", "tarball", "archive", "case-insensitive", "extract"]
