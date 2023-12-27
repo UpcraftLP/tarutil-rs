@@ -13,9 +13,6 @@ pub(crate) struct Args {
     #[arg(short = 'o', long)]
     pub output: Option<PathBuf>,
 
-    #[arg(last = true)]
-    pub input: PathBuf,
-
     #[arg(long)]
     pub mapping_file: Option<PathBuf>,
 
@@ -30,4 +27,7 @@ pub(crate) struct Args {
 
     #[arg(long, default_value = "()[]{}-+*=&@!?'#$%^~^´`:,;<>|\"\\")]
     pub filter_chars: String,
+
+    #[arg()]
+    pub input: PathBuf,
 }
