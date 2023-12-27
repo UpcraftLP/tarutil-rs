@@ -19,10 +19,18 @@ fn main() -> anyhow::Result<()> {
 
     let replacements = args.filter_chars.chars().collect::<Vec<char>>();
 
-    let tar_gz = File::open(&args.input)?;
+    let file_handle = File::open(&args.input)?;
 
-    let mut tar = Archive::new(GzDecoder::new(&tar_gz));
-    let archive_size = tar_gz.metadata()?.len();
+    let mut tar: Archive<Box<dyn Read>>;
+
+    if args.gzip || args.input.extension().unwrap_or_default() == "gz" {
+        tar = Archive::new(Box::new(GzDecoder::new(&file_handle)));
+    }
+    else {
+        tar = Archive::new(Box::new(&file_handle));
+    }
+
+    let archive_size = file_handle.metadata()?.len();
 
     let mut paths: BiMap<String, String> = BiHashMap::new();
 
@@ -113,7 +121,7 @@ fn main() -> anyhow::Result<()> {
             }
         }
 
-        let seek = tar_gz.try_clone()?.stream_position()?;
+        let seek = file_handle.try_clone()?.stream_position()?;
         pb.set_position(seek);
     }
     pb.finish_and_clear();

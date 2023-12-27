@@ -25,6 +25,9 @@ pub(crate) struct Args {
     #[arg(long, default_value = "()[]{}-+*=&@!?'#$%^~^´`:,;<>|\"\\")]
     pub filter_chars: String,
 
+    #[arg(long, default_value = "false")]
+    pub gzip: bool,
+
     #[arg()]
     pub input: PathBuf,
 }
