@@ -1,10 +1,14 @@
 mod cli;
 
-use std::{fs, io};
+use std::{fs, io, thread};
+use std::collections::VecDeque;
 use std::ffi::OsString;
 use std::io::prelude::*;
 use std::fs::File;
+use std::hint::spin_loop;
 use std::io::BufWriter;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use bimap::{BiHashMap, BiMap};
@@ -36,6 +40,24 @@ fn main() -> anyhow::Result<()> {
 
     let mut mapping_file = args.tasks.mapping_file.map(|p| BufWriter::new(File::create(p).expect("Failed to create mapping file")));
     let mut errors: Vec<String> = Vec::new();
+
+    let close_handles: Arc<Mutex<VecDeque<File>>> = Arc::new(Mutex::new(VecDeque::new()));
+
+    let running = Arc::new(AtomicBool::new(true));
+
+    // spawn a thread to close the file handles
+    // this will be done in a separate thread to not have AVs block the main thread
+    let running_clone = Arc::clone(&running);
+    let close_handles_clone = Arc::clone(&close_handles);
+    let file_closer_thread = thread::spawn(move || {
+        while running_clone.load(Ordering::SeqCst) {
+            while let Some(mut handle) = close_handles_clone.lock().unwrap().pop_front() {
+                handle.flush().ok();
+                handle.sync_all().ok();
+            }
+            spin_loop();
+        }
+    });
 
     println!("Processing archive...");
     let pb = ProgressBar::new(archive_size)
@@ -118,6 +140,7 @@ fn main() -> anyhow::Result<()> {
                 let mut out_file = File::create(out_path)?;
 
                 io::copy(entry.by_ref(), &mut out_file)?;
+                close_handles.lock().unwrap().push_back(out_file);
             }
         }
 
@@ -125,6 +148,10 @@ fn main() -> anyhow::Result<()> {
         pb.set_position(seek);
     }
     pb.finish_and_clear();
+
+    running.store(false, Ordering::SeqCst);
+    file_closer_thread.join().ok();
+
     println!("Done! ({})", HumanDuration(now.elapsed()));
 
     if !errors.is_empty() {
